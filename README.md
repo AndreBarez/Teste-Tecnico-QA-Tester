@@ -4,6 +4,17 @@ Resolução: 1920x1080.
 
 # Teste Técnico – QA Tester - Processo Seletivo – 4blue
 
+### Resumo de Severidade e Prioridade
+
+Abaixo, apresento meu quadro consolidado com a classificação dos problemas identificados durante o ciclo de testes:
+
+| Severidade | Quantidade | Exemplos Principais | Prioridade Predominante |
+| :--- | :---: | :--- | :--- |
+| **Crítico** | 2 | - Login com campos vazios (Issue 6)<br>- Confirmação de senha diferente (Issue 13) | **Alta** |
+| **Alto** | 7 | - Brute Force (Issue 5)<br>- Criação de contas vazias/duplicadas (Issues 7 e 8)<br>- E-mail/senha inválidos aceitos (Issues 11 e 12)<br>- Vulnerabilidade XSS (Issue 14) | **Alta** |
+| **Médio** | 5 | - Login com e-mail inválido (Issue 4)<br>- Campos com valores inválidos (Issues 9 e 10)<br>- Quebra de layout<br>- Falta de confirmação de e-mail | **Média/Alta** |
+| **Baixo** | 3 | - Regra de senha na tela errada (Issue 1)<br>- Sem visualização de senha (Issue 3)<br>- Mensagem de erro inesperada (Tela de Sucesso) | **Baixa/Média** |
+
 ##  Tela de Login
 
 ### 1. Regra de criação de senha exibida na tela de login
@@ -96,6 +107,24 @@ Resolução: 1920x1080.
 | O sistema permite realizar login. | O sistema deveria impedir a criação de contas vazias e bloquear logins sem dados. |
 
 **Severidade:** Crítico | **Prioridade:** Alta
+
+---
+
+### 18. Mensagem de erro inadequada ao inserir senha incorreta
+**Descrição:** Ao tentar realizar o login com um e-mail cadastrado, mas inserindo a senha incorreta, o sistema exibe a mensagem “Conta não encontrada. Crie uma conta primeiro”. Esta mensagem é tecnicamente falsa (pois a conta existe) e perigosa por permitir a confirmação de e-mails cadastrados na base.
+
+**Passos para reproduzir:**
+1. Possuir uma conta já cadastrada no sistema.
+2. Acessar a tela de login.
+3. Inserir o e-mail correto da conta.
+4. Inserir uma **senha incorreta**.
+5. Clicar em Entrar.
+
+| Resultado Atual | Resultado Esperado |
+| :--- | :--- |
+| O sistema exibe: “Conta não encontrada. Crie uma conta primeiro.” | O sistema deve exibir uma mensagem genérica como: “E-mail ou senha inválidos.” |
+
+**Severidade:** Médio | **Prioridade:** Média
 
 ---
 
@@ -221,7 +250,7 @@ Resolução: 1920x1080.
 
 ---
 
-### Título: Quebra de Layout nos Campos
+### 15. Quebra de Layout nos Campos
 **Descrição:** Os campos "Telefone" e "Confirmar Senha" ultrapassam o limite lateral do card branco de cadastro sobrepondo outro campos, prejudicando a estética e a usabilidade em resoluções de desktop.
 
 **Passos para reproduzir:**
@@ -236,7 +265,7 @@ Resolução: 1920x1080.
 
 ---
 
-### Título: Falta de campo "Confirmar E-mail" no formulário de cadastro
+### 16. Falta de campo "Confirmar E-mail" no formulário de cadastro
 **Descrição:** O formulário de criação de conta solicita a confirmação da senha, mas não oferece um campo para confirmar o e-mail digitado. Isso permite que erros de digitação passem despercebidos, impossibilitando recuperações de senha futuras ou comunicações do sistema.
 
 **Passos para reproduzir:**
@@ -254,7 +283,7 @@ Resolução: 1920x1080.
 ##  Tela simples de Sucesso
 
 
-### Título: Mensagem de “Erro inesperado” exibida após login realizado com sucesso
+###  17. Mensagem de “Erro inesperado” exibida após login realizado com sucesso
 **Descrição:** Após realizar login com credenciais válidas, o sistema redireciona corretamente para a tela de sucesso informando que o login foi realizado. Porém, simultaneamente é exibida uma notificação no canto inferior direito com a mensagem “Erro inesperado”, gerando inconsistência de feedback para o usuário.
 
 **Passos para reproduzir:**
@@ -269,5 +298,35 @@ Resolução: 1920x1080.
 | O sistema redireciona para a tela “Login realizado com sucesso”, mas exibe simultaneamente a notificação “Erro inesperado” no canto inferior direito. | Após login bem-sucedido, nenhuma mensagem de erro deve ser exibida. Apenas a confirmação de sucesso deve aparecer. |
 
 **Severidade:** Baixo | **Prioridade:** Baixo
+
+---
+
+## Priorização de Correções (Hotfixes)
+
+**Pergunta: Quais 2 bugs você corrigiria primeiro e por quê?**
+
+**Resposta:**
+
+1. **Bug 7: Sistema permite criar conta com campos vazios**
+   * **Por que:** Este bug compromete a base de dados. Permitir que um cliente se cadastre sem dados reais gera "contas fantasmagóricas", impossibilita comunicações futuras (e-mail marketing, recuperação de senha) e distorce completamente as métricas de crescimento e uso do sistema.
+
+2. **Bug 14: Possível vulnerabilidade XSS nos campos de cadastro**
+   * **Por que:** Este é o risco mais crítico de segurança. A capacidade de injetar scripts nos campos permite que roubem cookies de sessão, redirecionem usuários para sites maliciosos ou capturem senhas de outros clientes. Corrigir isso é vital para proteger os dados dos usuários e a reputação da empresa e evitar processos por LGPD.
+
+
+---
+
+##  Sugestões de Melhorias (UX/UI)
+
+1. **Feedback em Tempo Real para Requisitos de Senha:**
+   * **Benefício:** Em vez de exibir as regras apenas como texto estático (Issue 1), o sistema deve validar os critérios (8 caracteres, caractere especial, etc.) conforme o usuário digita. 
+   * **Impacto:** Melhora a taxa de conversão no cadastro, indicando ao usuário onde está o erro.
+
+2. **Ícones de Visualização de Senha (Show/Hide Password):**
+   * **Benefício:** Adicionar um ícone de "olho" nos campos de senha e confirmação de senha.
+   * **Impacto:** Permite que o usuário verifique o que digitou, evitando erros de digitação comuns (Issue 3) e reduzindo a frustração de bloqueios por senha incorreta.
+
+---
+
 
 
